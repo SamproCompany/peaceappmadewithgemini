@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Inner Calm Space</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Tone.js for Ambient Sound -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.min.js"></script>
+    <style>
+        /* Custom styles for the breathing circle animation */
+        .breathe-circle {
+            width: 150px;
+            height: 150px;
+            background-color: #93c5fd; /* light blue-400 */
+            border-radius: 50%;
+            transition: transform 6s ease-in-out;
+            box-shadow: 0 0 30px rgba(147, 197, 253, 0.7);
+            margin: 0 auto;
+        }
+
+        .breathing-in {
+            transform: scale(1.5);
+            background-color: #60a5fa; /* blue-400 */
+            box-shadow: 0 0 40px rgba(96, 165, 250, 0.9);
+        }
+
+        .breathing-out {
+            transform: scale(1.0);
+            background-color: #93c5fd; /* light blue-400 */
+        }
+        
+        /* Apply Inter font */
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'calm-bg': '#f3f4f6', // Light gray background
+                        'calm-blue': '#60a5fa', // Blue for accents
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-calm-bg text-gray-800 flex flex-col items-center justify-center p-4">
+
+    <!-- Main Container -->
+    <div class="w-full max-w-2xl bg-white p-6 md:p-10 rounded-xl shadow-2xl space-y-6">
+        
+        <header class="text-center border-b pb-4 border-gray-100">
+            <h1 class="text-4xl font-extrabold text-calm-blue">The Inner Calm Space</h1>
+            <p class="mt-2 text-gray-500">A digital moment for emotional uplift and peace.</p>
+        </header>
+
+        <!-- Section 1: Guided Breathing -->
+        <section class="bg-blue-50 p-6 rounded-lg border border-blue-100 shadow-inner space-y-4">
+            <h2 class="text-2xl font-semibold text-blue-700">1. Take a Breath</h2>
+            <p class="text-gray-600">Follow the circle. Breathe in as it expands, and breathe out as it contracts.</p>
+
+            <div class="flex flex-col items-center justify-center space-y-4">
+                <div id="breathe-circle" class="breathe-circle"></div>
+                <div id="breathe-instruction" class="text-xl font-bold text-gray-700 h-8">Click to start</div>
+            </div>
+
+            <button id="start-breathe" 
+                    class="w-full py-3 bg-calm-blue text-white font-semibold rounded-lg hover:bg-blue-600 transition duration-300 shadow-md hover:shadow-lg">
+                Start 4-7-8 Breathing
+            </button>
+        </section>
+
+        <!-- Section 2: Instant Uplift Prompts -->
+        <section class="bg-green-50 p-6 rounded-lg border border-green-100 shadow-inner space-y-4">
+            <h2 class="text-2xl font-semibold text-green-700">2. Instant Positive Prompt</h2>
+            <p class="text-gray-600">Need a quick shift? Read a gentle reminder.</p>
+            
+            <div class="min-h-20 flex items-center justify-center p-4 bg-white rounded-lg border border-green-200">
+                <p id="affirmation-text" class="italic text-center text-lg font-medium text-gray-700">
+                    "Click the button below to receive an instant spark of kindness."
+                </p>
+            </div>
+
+            <button id="generate-affirmation" 
+                    class="w-full py-3 bg-green-500 text-white font-semibold rounded-lg hover:bg-green-600 transition duration-300 shadow-md hover:shadow-lg">
+                Give Me a Gentle Thought
+            </button>
+        </section>
+
+        <!-- Section 3: Creative / Mindful Task (5-4-3-2-1 Grounding) -->
+        <section class="bg-purple-50 p-6 rounded-lg border border-purple-100 shadow-inner space-y-4">
+            <h2 class="text-2xl font-semibold text-purple-700">3. Mindful Grounding</h2>
+            <p class="text-gray-600">Take 60 seconds and use your senses to bring focus to the present moment (5-4-3-2-1 exercise).</p>
+            <ul class="list-disc list-inside space-y-2 text-gray-700 pl-4">
+                <li><span class="font-semibold">Find 5 things</span> you can see.</li>
+                <li><span class="font-semibold">Find 4 things</span> you can feel (texture, temperature).</li>
+                <li><span class="font-semibold">Find 3 things</span> you can hear right now.</li>
+                <li><span class="font-semibold">Find 2 things</span> you can smell.</li>
+                <li><span class="font-semibold">Find 1 thing</span> you can taste.</li>
+            </ul>
+        </section>
+
+        <!-- Section 4: Ambient Soundscape (Aural Sanctuary) -->
+        <section class="bg-indigo-50 p-6 rounded-lg border border-indigo-100 shadow-inner space-y-4">
+            <h2 class="text-2xl font-semibold text-indigo-700">4. Gentle Soundscape</h2>
+            <p class="text-gray-600">A soft, continuous tone to mask distractions and deepen focus. Requires user interaction to start audio.</p>
+            
+            <button id="toggle-sound" 
+                    class="w-full py-3 bg-indigo-500 text-white font-semibold rounded-lg hover:bg-indigo-600 transition duration-300 shadow-md">
+                Start Calming Hum
+            </button>
+        </section>
+
+        <!-- Section 5: Guided Visualization -->
+        <section class="bg-pink-50 p-6 rounded-lg border border-pink-100 shadow-inner space-y-4">
+            <h2 class="text-2xl font-semibold text-pink-700">5. Inner Sanctuary Visualization</h2>
+            <p class="text-gray-600">Close your eyes and let this script guide your mind to a peaceful place.</p>
+            
+            <div id="visualization-script" class="min-h-32 p-4 bg-white rounded-lg border border-pink-200 italic text-gray-700">
+                <p>Click the button below to load a 60-second guided visualization script.</p>
+            </div>
+
+            <button id="load-visualization" 
+                    class="w-full py-3 bg-pink-500 text-white font-semibold rounded-lg hover:bg-pink-600 transition duration-300 shadow-md">
+                Load Visualization Script
+            </button>
+        </section>
+
+        <!-- Section 6: Mindful Pulse Count (Biofeedback) -->
+        <section class="bg-yellow-50 p-6 rounded-lg border border-yellow-100 shadow-inner space-y-4">
+            <h2 class="text-2xl font-semibold text-yellow-700">6. Mindful Pulse Count</h2>
+            <p class="text-gray-600">Focus on your breath and find your pulse (wrist or neck). Tap the button once for every heartbeat for 15 seconds.</p>
+
+            <div class="flex items-center justify-between p-4 bg-white rounded-lg border border-yellow-200">
+                <span class="text-lg font-medium text-gray-700">Heartbeats Tapped: <span id="pulse-count" class="font-bold text-xl text-yellow-600">0</span></span>
+                <span class="text-lg font-medium text-gray-700">Approx. BPM: <span id="pulse-bpm" class="font-bold text-xl text-yellow-600">--</span></span>
+            </div>
+
+            <button id="start-pulse" 
+                    class="w-full py-3 bg-yellow-500 text-white font-semibold rounded-lg hover:bg-yellow-600 transition duration-300 shadow-md">
+                Start Pulse Count (15s)
+            </button>
+            <button id="tap-pulse" 
+                    class="w-full py-3 bg-gray-300 text-gray-700 font-semibold rounded-lg transition duration-300 shadow-md pointer-events-none" disabled>
+                Tap for Heartbeat
+            </button>
+        </section>
+        
+    </div>
+
+    <script>
+        // --- Visualization Scripts ---
+        const visualizationScripts = [
+            "Imagine you are sitting beside a still, crystal-clear lake. The air is warm, and a gentle breeze rustles the leaves above you. You hear only the sound of nature and feel the solid earth beneath your feet. Breathe in the calm silence, breathe out any worry, and allow the peace of this place to fill you completely.",
+            "Picture a warm, comforting light surrounding you, entering your body with every inhale. This light washes away tension and doubt. Feel it relax your shoulders, smooth your brow, and steady your mind. You are safe, you are protected, and you are radiating peace.",
+            "Visualize walking down a favorite path—a memory or a dream place. The colors are vivid, the path is easy, and there is no hurry. Notice the details: the texture of the ground, the scent in the air, the warmth of the sun on your skin. This place is your sanctuary, and you can return anytime you need rest."
+        ];
+
+        const visualizationScriptContainer = document.getElementById('visualization-script');
+        const loadVisualizationButton = document.getElementById('load-visualization');
+
+        loadVisualizationButton.addEventListener('click', () => {
+            const randomIndex = Math.floor(Math.random() * visualizationScripts.length);
+            visualizationScriptContainer.innerHTML = `<p>${visualizationScripts[randomIndex]}</p>`;
+        });
+
+        // --- Affirmation Generator Logic ---
+        const affirmations = [
+            "You are enough, just as you are, right now.",
+            "I choose peace over panic, and calm over chaos.",
+            "My struggles do not define me; my response to them does.",
+            "I am capable of handling whatever this day brings.",
+            "I give myself permission to rest and recharge.",
+            "I am learning and growing every single day.",
+            "Small steps forward still count as progress.",
+            "I treat myself with the same kindness I offer a friend.",
+            "Today, I focus on what I can control, and release what I cannot."
+        ];
+
+        const affirmationText = document.getElementById('affirmation-text');
+        const generateButton = document.getElementById('generate-affirmation');
+
+        generateButton.addEventListener('click', () => {
+            const randomIndex = Math.floor(Math.random() * affirmations.length);
+            affirmationText.textContent = `"${affirmations[randomIndex]}"`;
+        });
+
+        // --- Guided Breathing Logic (4-7-8 Technique) ---
+        const circle = document.getElementById('breathe-circle');
+        const instruction = document.getElementById('breathe-instruction');
+        const startButton = document.getElementById('start-breathe');
+        let isBreathing = false;
+        let breathingTimer;
+
+        // Utility function for delay
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        async function runBreathingCycle() {
+            if (!isBreathing) return;
+
+            // Cycle 1: Breathe In (4 seconds)
+            instruction.textContent = "Breathe In (4)";
+            circle.classList.add('breathing-in');
+            await sleep(1000); instruction.textContent = "Breathe In (3)";
+            await sleep(1000); instruction.textContent = "Breathe In (2)";
+            await sleep(1000); instruction.textContent = "Breathe In (1)";
+            await sleep(1000);
+            
+            if (!isBreathing) return;
+
+            // Cycle 2: Hold (7 seconds)
+            instruction.textContent = "Hold (7)";
+            circle.classList.remove('breathing-in');
+            circle.style.backgroundColor = '#fca5a5'; // Reddish for hold
+            await sleep(1000); instruction.textContent = "Hold (6)";
+            await sleep(1000); instruction.textContent = "Hold (5)";
+            await sleep(1000); instruction.textContent = "Hold (4)";
+            await sleep(1000); instruction.textContent = "Hold (3)";
+            await sleep(1000); instruction.textContent = "Hold (2)";
+            await sleep(1000); instruction.textContent = "Hold (1)";
+            await sleep(1000);
+
+            if (!isBreathing) return;
+
+            // Cycle 3: Breathe Out (8 seconds)
+            instruction.textContent = "Breathe Out (8)";
+            circle.classList.add('breathing-out');
+            circle.style.backgroundColor = '#93c5fd'; // Back to light blue
+            await sleep(1000); instruction.textContent = "Breathe Out (7)";
+            await sleep(1000); instruction.textContent = "Breathe Out (6)";
+            await sleep(1000); instruction.textContent = "Breathe Out (5)";
+            await sleep(1000); instruction.textContent = "Breathe Out (4)";
+            await sleep(1000); instruction.textContent = "Breathe Out (3)";
+            await sleep(1000); instruction.textContent = "Breathe Out (2)";
+            await sleep(1000); instruction.textContent = "Breathe Out (1)";
+            await sleep(1000);
+
+            circle.classList.remove('breathing-out');
+            
+            // Repeat the cycle
+            if (isBreathing) {
+                breathingTimer = setTimeout(runBreathingCycle, 100);
+            }
+        }
+
+        function startBreathing() {
+            if (isBreathing) {
+                // Stop the previous cycle
+                clearTimeout(breathingTimer);
+                isBreathing = false;
+                startButton.textContent = "Start 4-7-8 Breathing";
+                instruction.textContent = "Cycle Paused";
+                circle.classList.remove('breathing-in', 'breathing-out');
+                circle.style.backgroundColor = '#93c5fd'; // Reset color
+            } else {
+                // Start a new cycle
+                isBreathing = true;
+                startButton.textContent = "Pause Breathing Exercise";
+                runBreathingCycle();
+            }
+        }
+
+        startButton.addEventListener('click', startBreathing);
+
+        // --- Tone.js Ambient Sound Logic ---
+        let ambientSynth = null;
+        let isSoundPlaying = false;
+        const soundButton = document.getElementById('toggle-sound');
+
+        async function toggleAmbientSound() {
+            try {
+                // Check and start audio context if necessary (required for user interaction)
+                if (Tone.context.state !== 'running') {
+                    await Tone.start();
+                }
+
+                if (isSoundPlaying) {
+                    // Stop
+                    if (ambientSynth) {
+                        ambientSynth.releaseAll();
+                    }
+                    isSoundPlaying = false;
+                    soundButton.textContent = "Start Calming Hum";
+                    soundButton.classList.remove('bg-red-500', 'hover:bg-red-600');
+                    soundButton.classList.add('bg-indigo-500', 'hover:bg-indigo-600');
+                } else {
+                    // Start
+                    if (!ambientSynth) {
+                        // Create a simple, low, and smooth ambient pad using a PolySynth
+                        const reverb = new Tone.Reverb(4).toDestination();
+                        
+                        ambientSynth = new Tone.PolySynth(Tone.DuoSynth, {
+                            envelope: {
+                                attack: 5,
+                                decay: 0.1,
+                                sustain: 1,
+                                release: 10
+                            },
+                            volume: -25 
+                        }).connect(reverb);
+                    }
+                    
+                    // Play a long, low, calming chord (C2 major)
+                    ambientSynth.triggerAttack(["C2", "E2", "G2"]);
+                    
+                    isSoundPlaying = true;
+                    soundButton.textContent = "Stop Calming Hum";
+                    soundButton.classList.remove('bg-indigo-500', 'hover:bg-indigo-600');
+                    soundButton.classList.add('bg-red-500', 'hover:bg-red-600');
+                }
+            } catch (error) {
+                console.error("Error toggling ambient sound:", error);
+                soundButton.textContent = "Sound Error (Check Console)";
+            }
+        }
+
+        soundButton.addEventListener('click', toggleAmbientSound);
+        
+        // --- Mindful Pulse Count Logic ---
+        const startPulseButton = document.getElementById('start-pulse');
+        const tapPulseButton = document.getElementById('tap-pulse');
+        const pulseCountDisplay = document.getElementById('pulse-count');
+        const pulseBPMDisplay = document.getElementById('pulse-bpm');
+
+        let isCounting = false;
+        let pulseCount = 0;
+        const COUNT_DURATION = 15000; // 15 seconds
+
+        function resetPulseCounter() {
+            isCounting = false;
+            pulseCount = 0;
+            pulseCountDisplay.textContent = 0;
+            pulseBPMDisplay.textContent = '--';
+            startPulseButton.textContent = "Start Pulse Count (15s)";
+            startPulseButton.disabled = false;
+            tapPulseButton.textContent = "Tap for Heartbeat";
+            tapPulseButton.disabled = true;
+            tapPulseButton.classList.add('bg-gray-300', 'text-gray-700', 'pointer-events-none');
+            tapPulseButton.classList.remove('bg-yellow-400', 'text-black', 'hover:bg-yellow-500', 'active:scale-95');
+        }
+
+        function startPulseCount() {
+            if (isCounting) return;
+            // Immediate reset/start
+            resetPulseCounter(); 
+            
+            isCounting = true;
+            pulseBPMDisplay.textContent = 'Counting...';
+            startPulseButton.textContent = "Counting...";
+            startPulseButton.disabled = true;
+
+            tapPulseButton.disabled = false;
+            tapPulseButton.textContent = "Tap!";
+            tapPulseButton.classList.remove('bg-gray-300', 'text-gray-700', 'pointer-events-none');
+            tapPulseButton.classList.add('bg-yellow-400', 'text-black', 'hover:bg-yellow-500'); // No active:scale-95 needed here, it's in handleTap
+
+            // Timer to stop the counting
+            setTimeout(stopPulseCount, COUNT_DURATION);
+        }
+
+        function stopPulseCount() {
+            if (!isCounting) return;
+
+            startPulseButton.disabled = false;
+            tapPulseButton.disabled = true;
+            isCounting = false;
+
+            // Calculate BPM: (count / duration in seconds) * 60
+            // (15000 / 1000) = 15 seconds
+            const bpm = pulseCount * (60 / (COUNT_DURATION / 1000)); 
+            
+            if (pulseCount === 0) {
+                pulseBPMDisplay.textContent = '0';
+                startPulseButton.textContent = `No Taps Recorded. Try Again?`;
+            } else {
+                pulseBPMDisplay.textContent = Math.round(bpm);
+                startPulseButton.textContent = `Result: ${Math.round(bpm)} BPM! Restart?`;
+            }
+
+            tapPulseButton.classList.add('bg-gray-300', 'text-gray-700', 'pointer-events-none');
+            tapPulseButton.classList.remove('bg-yellow-400', 'text-black', 'hover:bg-yellow-500');
+            
+            // Set a slight delay before allowing restart or reset
+            // We use the startPulseButton state to handle the 'Restart' option.
+        }
+
+        function handleTap() {
+            if (isCounting) {
+                pulseCount++;
+                pulseCountDisplay.textContent = pulseCount;
+                
+                // Visual feedback on tap
+                tapPulseButton.classList.add('scale-95');
+                setTimeout(() => tapPulseButton.classList.remove('scale-95'), 100);
+            }
+        }
+
+        startPulseButton.addEventListener('click', startPulseCount);
+        tapPulseButton.addEventListener('click', handleTap);
+        
+        // Initial setup
+        resetPulseCounter();
+    </script>
+</body>
+</html>
